@@ -13,7 +13,7 @@ module.exports = {
       return response.status(404).json({ error: 'ONG not found with the ID provided' });
     }
 
-    return response.json({ ong });
+    return response.json(ong);
   }
 
 }
