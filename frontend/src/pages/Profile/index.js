@@ -14,38 +14,53 @@ export default function Profile() {
 
   const ongName = localStorage.getItem('ongName');
   const ongId = localStorage.getItem('ongId');
+  const token = localStorage.getItem('@Hero-token');
 
   useEffect(() => {
-    api.get('/profile', {
-      headers: {
-        Authorization: ongId
-      }
-    }).then(response => {
-      setIncidents(response.data.incidents);
-    });
+    if (!token) {
+      history.push('/');
+    }
 
-  }, [ongId]);
+    async function loadProfile() {
+      try {
+        const response = await api.get('/profile', {
+          headers: {
+            'Authorization': ongId,
+            'x-access-token': token
+          }
+        });
+  
+        setIncidents(response.data.incidents);
+      } catch {
+        history.push('/');
+      }
+    }
+
+    loadProfile();
+  }, [ongId, token, history]);
   
   async function handleDeleteIncident(id){
     try{
       await api.delete(`incidents/${id}`, {
         headers: {
-          Authorization: ongId
+          'Authorization': ongId,
+          'x-access-token': token
         }
       });
 
     setIncidents(incidents.filter(incident => incident.id !== id))
     } catch(e) {
       alert(`Erro ao deletar o caso`);
-      console.log(e)
     }
   } 
 
   function handleLogOut() {
     localStorage.removeItem('ongId');
     localStorage.removeItem('ongName');
+    localStorage.removeItem('@Hero-token');
     history.push('/');
   }
+
 
   return (
     <div className="profile-container">

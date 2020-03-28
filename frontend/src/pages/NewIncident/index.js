@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { FiArrowLeft } from 'react-icons/fi';
 
@@ -16,6 +16,31 @@ export default function NewIncident() {
   const history = useHistory();
 
   const ongId = localStorage.getItem('ongId');
+  const token = localStorage.getItem('@Hero-token');
+
+  useEffect(() => {
+    if (!token || !ongId) {
+      history.push('/');
+    }
+
+    async function validateAuth() {
+      const response = await api.get('/token', {
+        headers: {
+          'authorization': ongId,
+          'x-access-token': token
+        }
+      });
+
+      const authIsValid = response.data.auth;
+
+      if(!authIsValid) {
+        history.push('/');
+      }
+    };
+
+    validateAuth();
+  }, [history, token, ongId]);
+
 
   async function handleNewIncident(e) {
     e.preventDefault();
@@ -28,13 +53,14 @@ export default function NewIncident() {
     try{
       await api.post('incidents', data, {
         headers: {
-          Authorization: ongId
+          'Authorization': ongId,
+          'x-access-token': token
         }
       });
 
       history.push('/profile');
 
-    } catch {
+    } catch(e) {
       alert('Erro ao criar o novo caso. Tente novamente.')
     }
   }

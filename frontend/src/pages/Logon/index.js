@@ -19,11 +19,19 @@ export default function Logon() {
 
     try{
       const response = await api.post('/sessions', { id });
-      alert(`Bem-vinda ${response.data.name}`)
-      localStorage.setItem('ongId', id);
-      localStorage.setItem('ongName', response.data.name)
 
-      history.push('/profile');
+      if(response.data.auth) {
+
+        alert(`Bem-vinda ${response.data.ong.name}`);
+        localStorage.setItem('ongId', id);
+        localStorage.setItem('ongName', response.data.ong.name);
+        localStorage.setItem('@Hero-token', response.data.token);
+
+  
+        history.push('/profile');
+      } else {
+        alert('Erro no logon (auth)');
+      }
     } catch {
       alert(`Erro no logon`);
     }

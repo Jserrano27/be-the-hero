@@ -5,6 +5,9 @@ const OngController = require('./controllers/OngController');
 const ProfileController = require('./controllers/ProfileController');
 const IncidentController = require('./controllers/IncidentController');
 const SessionController = require('./controllers/SessionController');
+const tokenController = require('./controllers/tokenController');
+
+const verifyJWT = require('./utils/verifyJWT');
 
 const routes = express.Router();
 
@@ -48,7 +51,7 @@ routes.get('/profile', celebrate({
       [Segments.HEADERS]: Joi.object({
         authorization: Joi.string().required().length(8)
       }).unknown()
-    }), ProfileController.index); 
+    }), verifyJWT, ProfileController.index); 
 
 routes.get('/incidents', celebrate({
   [Segments.QUERY]: {
@@ -65,7 +68,7 @@ routes.post('/incidents', celebrate({
       [Segments.HEADERS]: Joi.object({
         authorization: Joi.string().required().length(8)
       }).unknown()
-    }), IncidentController.create);
+    }), verifyJWT, IncidentController.create);
 
 routes.delete('/incidents/:id', celebrate({
       [Segments.PARAMS]: {
@@ -74,7 +77,14 @@ routes.delete('/incidents/:id', celebrate({
       [Segments.HEADERS]: Joi.object({
         authorization: Joi.string().required().length(8)
       }).unknown()
-    }), IncidentController.delete);
+    }), verifyJWT, IncidentController.delete);
+
+routes.get('/token', celebrate({
+  [Segments.HEADERS]: Joi.object({
+    'authorization': Joi.string().required(),
+    'x-access-token': Joi.string().required()
+  }).unknown()
+}), tokenController.verify);
 
 
 
