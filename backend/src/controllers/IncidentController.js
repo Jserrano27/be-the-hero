@@ -1,4 +1,4 @@
-const connection = require('../connection');
+const connection = require('../database/connection');
 
 module.exports = {
   async index(request, response) {
@@ -45,8 +45,9 @@ module.exports = {
   async delete(request, response) {
     const { id } = request.params;
     const ong_id = request.headers.authorization;
-
-    const incident = await connection('incidents')
+    
+    try {
+      const incident = await connection('incidents')
       .where('id', id)
       .select('ong_id')
       .first();
@@ -54,9 +55,14 @@ module.exports = {
       if (incident.ong_id !== ong_id) {
         return response.status(401).json({ error: 'Operation not permitted' });
       }
-
+      
       await connection('incidents').where('id', id).delete();
 
       return response.status(204).send();
+
+    } catch (e){
+      return response.status(404).json({ error: 'Error while deleting incident. Try again' });
+    }
+    
   }
 }

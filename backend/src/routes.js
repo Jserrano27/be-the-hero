@@ -1,9 +1,10 @@
 const express = require('express');
+const { celebrate, Joi, Segments } = require('celebrate');
 
-const OngController = require('./database/controllers/OngController');
-const ProfileController = require('./database/controllers/ProfileController');
-const IncidentController = require('./database/controllers/IncidentController');
-const SessionController = require('./database/controllers/SessionController');
+const OngController = require('./controllers/OngController');
+const ProfileController = require('./controllers/ProfileController');
+const IncidentController = require('./controllers/IncidentController');
+const SessionController = require('./controllers/SessionController');
 
 const routes = express.Router();
 
@@ -25,16 +26,55 @@ const routes = express.Router();
  * NoSQL: MongoDB, CouchDB, etc.
  */
 
-routes.post('/sessions', SessionController.create)
+routes.post('/sessions', celebrate({
+      [Segments.BODY]: Joi.object().keys({
+        id: Joi.string().required().length(8)
+      })
+    }), SessionController.create)
 
 routes.get('/ongs', OngController.index);
-routes.post('/ongs', OngController.create);
 
-routes.get('/profile', ProfileController.index); 
+routes.post('/ongs', celebrate({
+  [Segments.BODY]: Joi.object().keys({
+    name: Joi.string().required(),
+    email: Joi.string().required().email(),
+    whatsapp: Joi.string().min(10).max(11).required(),
+    city: Joi.string().required(),
+    uf: Joi.string().required().length(2)
+  })
+}), OngController.create);
 
-routes.get('/incidents', IncidentController.index);
-routes.post('/incidents', IncidentController.create);
-routes.delete('/incidents/:id', IncidentController.delete);
+routes.get('/profile', celebrate({
+      [Segments.HEADERS]: Joi.object({
+        authorization: Joi.string().required().length(8)
+      }).unknown()
+    }), ProfileController.index); 
+
+routes.get('/incidents', celebrate({
+  [Segments.QUERY]: {
+    page: Joi.number()
+  }
+}),IncidentController.index);
+
+routes.post('/incidents', celebrate({
+      [Segments.BODY]: Joi.object().keys({
+        title: Joi.string().required().min(3),
+        description: Joi.string().required().min(20),
+        value: Joi.number().required()
+      }),
+      [Segments.HEADERS]: Joi.object({
+        authorization: Joi.string().required().length(8)
+      }).unknown()
+    }), IncidentController.create);
+
+routes.delete('/incidents/:id', celebrate({
+      [Segments.PARAMS]: {
+        id: Joi.number().required()
+      },
+      [Segments.HEADERS]: Joi.object({
+        authorization: Joi.string().required().length(8)
+      }).unknown()
+    }), IncidentController.delete);
 
 
 
