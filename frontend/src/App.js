@@ -31,6 +31,7 @@ function reducer(state, action) {
 
     case 'LOGOUT':
       localStorage.clear();
+      sessionStorage.clear();
       
       return {
         ongId: null,
