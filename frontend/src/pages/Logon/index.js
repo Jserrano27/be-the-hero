@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { FiLogIn } from 'react-icons/fi';
+import { AuthContext } from '../../App';
 
 import api from '../../services/api';
 
@@ -10,6 +11,7 @@ import heroesImg from '../../assets/heroes.png';
 import logo from '../../assets/logo.svg';
 
 export default function Logon() {
+  const { dispatch } = React.useContext(AuthContext);
   const [id, setId] = useState('');
 
   const history = useHistory();
@@ -23,15 +25,16 @@ export default function Logon() {
       if(response.data.auth) {
 
         alert(`Bem-vinda ${response.data.ong.name}`);
-        localStorage.setItem('ongId', id);
-        localStorage.setItem('ongName', response.data.ong.name);
-        localStorage.setItem('@Hero-token', response.data.token);
 
-  
-        history.push('/profile');
-      } else {
-        alert('Erro no logon (auth)');
-      }
+        dispatch({
+          type: 'LOGIN',
+          payload: response.data
+        })
+    
+          history.push('/profile');
+        } else {
+          alert('Erro no logon');
+        }
     } catch {
       alert(`Erro no logon`);
     }

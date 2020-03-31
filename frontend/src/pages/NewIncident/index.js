@@ -19,28 +19,19 @@ export default function NewIncident() {
   const token = localStorage.getItem('@Hero-token');
 
   useEffect(() => {
-    if (!token || !ongId) {
-      history.push('/');
-    }
-
-    async function validateAuth() {
-      const response = await api.get('/token', {
+    async function verifyAuthentication() {
+      const response = await api.get('token', {
         headers: {
-          'authorization': ongId,
+          'Authorization': ongId,
           'x-access-token': token
         }
-      });
 
-      const authIsValid = response.data.auth;
+      })
+      if (response.data.auth === false) history.push('/');
+    }
 
-      if(!authIsValid) {
-        history.push('/');
-      }
-    };
-
-    validateAuth();
-  }, [history, token, ongId]);
-
+    verifyAuthentication();
+  }, [ongId, token, history])
 
   async function handleNewIncident(e) {
     e.preventDefault();

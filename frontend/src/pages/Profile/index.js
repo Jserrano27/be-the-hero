@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { FiPower, FiTrash2 } from 'react-icons/fi'
+import { AuthContext } from '../../App';
 
 import api from '../../services/api';
 
@@ -11,16 +12,13 @@ import './styles.css';
 export default function Profile() {
   const[incidents, setIncidents] = useState([]);
   const history = useHistory();
+  const { dispatch } = React.useContext(AuthContext);
 
   const ongName = localStorage.getItem('ongName');
   const ongId = localStorage.getItem('ongId');
   const token = localStorage.getItem('@Hero-token');
 
   useEffect(() => {
-    if (!token) {
-      history.push('/');
-    }
-
     async function loadProfile() {
       try {
         const response = await api.get('/profile', {
@@ -31,7 +29,7 @@ export default function Profile() {
         });
   
         setIncidents(response.data.incidents);
-      } catch {
+      } catch(e) {
         history.push('/');
       }
     }
@@ -55,12 +53,12 @@ export default function Profile() {
   } 
 
   function handleLogOut() {
-    localStorage.removeItem('ongId');
-    localStorage.removeItem('ongName');
-    localStorage.removeItem('@Hero-token');
+    dispatch({
+      type: 'LOGOUT'
+    });
+
     history.push('/');
   }
-
 
   return (
     <div className="profile-container">

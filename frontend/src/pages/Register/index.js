@@ -34,12 +34,10 @@ export default function Register() {
       history.push('/');
       
     } catch (e){
-      console.log(e.response)
       alert(`Erro no cadastro. Tente novamente.`)
     }
 
   }
-
 
   return (
     <div className="register-container">
