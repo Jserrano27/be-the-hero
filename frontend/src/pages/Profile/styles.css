@@ -44,6 +44,16 @@
   margin-bottom: 24px;
 }
 
+.profile-container h2 a:link, .profile-container h2 a:visited {
+  color: #E02041;
+}
+
+#loader {
+  margin: 50px auto;
+  width: 48px;
+  animation: spin 1.5s infinite linear;
+}
+
 .profile-container ul {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -87,6 +97,17 @@
   color: #737380;
   line-height: 21px;
   font-size: 16px;
+}
+
+@keyframes spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
 }
 
 
